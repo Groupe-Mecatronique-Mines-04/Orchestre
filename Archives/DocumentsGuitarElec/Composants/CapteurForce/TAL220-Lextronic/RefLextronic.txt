@@ -1,0 +1,15 @@
+le 04/11/2015
+
+Ce capteur est de chez HTC-SENSOR : www.HTC-SENSOR.COM
+
+Chez Lextronic
+
+Capteur de charge 10kg - IP66 TAL220	réf SEN-13329	15,00 € TTC
+
+ou version large : 
+Capteur de charge 10kg - IP66 TAL201	réf SEN-13330	15,00 € TTC
+
+Module ampli et numérisation pour capteur attention semble très lent !!!
+basé sur un HX711		SEN-13230	15,00 € TTC
+
+https://learn.sparkfun.com/tutorials/load-cell-amplifier-hx711-breakout-hookup-guide

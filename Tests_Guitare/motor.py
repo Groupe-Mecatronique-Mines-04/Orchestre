@@ -2,8 +2,8 @@ import time
 import serial
 import base64
 
-# motor = serial.Serial('/dev/tty.usbmodem1421', 57600)
-motor = serial.Serial('/dev/tty.usbserial-A9C7FL11', 57600)
+motor = serial.Serial('/dev/tty.usbmodem1421', 57600)
+#motor = serial.Serial('/dev/tty.usbserial-A9C7FL11', 57600)
 
 count = 0
 
@@ -156,6 +156,7 @@ def goToPos2(pos, velo, acc, dec):
     data[22]=middlehighd
     data[23]=highd
     data[24] = 0x04
+    print ''.join('{:02x}'.format(x) for x in data)
     return write(data, 32)
 
 
