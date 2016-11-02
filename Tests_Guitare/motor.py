@@ -2,7 +2,7 @@ import time
 import serial
 import base64
 
-motor = serial.Serial('/dev/tty.usbmodem1421', 57600)
+motor = serial.Serial('/dev/tty.usbmodem1411', 57600)
 #motor = serial.Serial('/dev/tty.usbserial-A9C7FL11', 57600)
 
 count = 0
