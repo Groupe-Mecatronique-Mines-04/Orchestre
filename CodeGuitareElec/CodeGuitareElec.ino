@@ -1,6 +1,7 @@
 // Serial1 is the LinMot
 
 int LINMOT_BAUDRATE = 57600;
+int USB_SERIAL_BAUDRATE = 57600;
 int count = 0;
 
 int getCount(){
@@ -31,10 +32,21 @@ int getSerialInteger(){
     }
 }
 
+
 void linMotSimpleWrite(int* buffer, int length){
 	Serial.print("Sending : ");
-	Serial.write((uint8_t*)buffer, length);
-	Serial1.write((uint8_t*)buffer, length);
+    for(int i=0; i<length;i++){
+        if(buffer[i]< 0x0f){
+            Serial.print(0x0, HEX);
+        }
+        Serial.print(buffer[i], HEX);
+        Serial.print(' ');
+        Serial1.write(buffer[i]);
+        delay(1);
+    }
+     Serial.println(' ');
+	//Serial.write((uint8_t*)buffer, length);
+
 }
 
 int linMotWriteWithAnswer(int* buffer, int length){
@@ -51,15 +63,18 @@ int linMotWriteWithAnswer(int* buffer, int length){
 
 void linMotStart(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x00, 0x00, 0x04};
+    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 void linMotHomingOn(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x3f, 0x08, 0x04};
+    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x3, 0xf, 0x0, 0x8, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 
 void linMotHomingOff(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x3f, 0x00, 0x04};
+    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x3, 0xf, 0x0, 0x0, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 
@@ -127,18 +142,21 @@ void linMotGoToPos(long pos, long velo, long acc, long dec)
 
 
 void linMotGoToPos(long pos){
-  linMotGoToPos(pos, 1000000, 1000000, 1000000);
+  linMotGoToPos(pos, 3000000, 1000000, 1000000);
 }
 
 
 
 
 void setup(){
-    Serial1.begin(LINMOT_BAUDRATE);
-    Serial.begin(115200);
+    //Serial1.begin(LINMOT_BAUDRATE);
+    //Serial.begin(USB_SERIAL_BAUDRATE);
 
-    linMotStartProcedure();
-    delay(5000);
+    Serial1.begin(57600);
+    Serial.begin(57600);
+
+    // linMotStartProcedure();
+    // delay(5000);
 
 }
 
@@ -146,8 +164,51 @@ void loop(){
  if (Serial.available()) {
     char ch = Serial.read();
     if(ch=='X'){
-      long pos = getSerialInteger();
+      long pos = 0;
+      Serial.print("Going to ");
+      Serial.println(pos);
       linMotGoToPos(pos);
+      Serial.println("Sent");
+    }
+    if(ch=='Y'){
+      long pos = 500000;
+      Serial.print("Going to ");
+      Serial.println(pos);
+      linMotGoToPos(pos);
+      Serial.println("Sent");
+    }
+    if(ch=='Z'){
+      long pos = 1000000;
+      Serial.print("Going to ");
+      Serial.println(pos);
+      linMotGoToPos(pos);
+      Serial.println("Sent");
+    }
+    if(ch=='W'){
+      long pos = 2000000;
+      Serial.print("Going to ");
+      Serial.println(pos);
+      linMotGoToPos(pos);
+      Serial.println("Sent");
+    }
+    if(ch=='S'){
+      Serial.println("Starting the motor...");
+      linMotStartProcedure();
+      Serial.println("Motor Ready");
     }
   } 
+
+
+
+  // if (Serial1.available()) {
+  //   int inByte = Serial1.read();
+  //   Serial.write(inByte);
+  // }
+
+  // // read from port 0, send to port 1:
+  // if (Serial.available()) {
+  //   int inByte = Serial.read();
+  //   Serial1.write(inByte);
+  // }
+
 }
