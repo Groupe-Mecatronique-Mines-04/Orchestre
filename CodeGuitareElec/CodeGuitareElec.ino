@@ -4,23 +4,41 @@ int LINMOT_BAUDRATE = 57600;
 int USB_SERIAL_BAUDRATE = 57600;
 int count = 0;
 
+
+long globalPosition = 0;
+long MAX_LINMOT_POSITION = 5400000;
+
 int getCount(){
     count = (count+1)%15;
     return count;
 }
 
-int getSerialInteger(){
-    int serialdata = 0;
+long getSerialInteger(){
+    long serialdata = 0;
     byte inbyte = '0';
     boolean isNegative = false;
 
     while (inbyte != ';')
     {
       inbyte = Serial.read();
-      if (inbyte > 0 && inbyte != ';')
-      {
-        if(inbyte == '-'){isNegative = true;}
-        else{serialdata = serialdata * 10 + inbyte - '0';}
+      if(    inbyte == '0' 
+          || inbyte == '1' 
+          || inbyte == '2' 
+          || inbyte == '3' 
+          || inbyte == '4' 
+          || inbyte == '5' 
+          || inbyte == '6' 
+          || inbyte == '7' 
+          || inbyte == '8' 
+          || inbyte == '9' 
+          || inbyte == ';' 
+          || inbyte == '-' 
+          ){
+        if (inbyte > 0 && inbyte != ';')
+        {
+          if(inbyte == '-'){isNegative = true;}
+          else{serialdata = serialdata * 10 + inbyte - '0';}
+        }
       }
     }
     inbyte = 0;
@@ -63,18 +81,15 @@ int linMotWriteWithAnswer(int* buffer, int length){
 
 void linMotStart(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x00, 0x00, 0x04};
-    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 void linMotHomingOn(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x3f, 0x08, 0x04};
-    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x3, 0xf, 0x0, 0x8, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 
 void linMotHomingOff(){
     int data[] = {0x01, 0x3f, 0x05, 0x02, 0x00, 0x01, 0x3f, 0x00, 0x04};
-    // int data[] = {0x0, 0x1, 0x3, 0xf, 0x0, 0x5, 0x0, 0x2, 0x0, 0x0, 0x0, 0x1, 0x3, 0xf, 0x0, 0x0, 0x0, 0x4};
     linMotSimpleWrite(data, 9);
 }
 
@@ -136,7 +151,6 @@ void linMotGoToPos(long pos, long velo, long acc, long dec)
     data[22]=middlehighd;
     data[23]=highd;
     data[24] = 0x04; //End
-
     linMotSimpleWrite(data, 25);
 }
 
@@ -145,50 +159,40 @@ void linMotGoToPos(long pos){
   linMotGoToPos(pos, 3000000, 1000000, 1000000);
 }
 
-
+void linMotGoToPosMM(long posInMM){
+  linMotGoToPos(posInMM*10000, 3000000, 1000000, 1000000);
+}
 
 
 void setup(){
-    //Serial1.begin(LINMOT_BAUDRATE);
-    //Serial.begin(USB_SERIAL_BAUDRATE);
-
     Serial1.begin(57600);
     Serial.begin(57600);
-
-    // linMotStartProcedure();
-    // delay(5000);
-
 }
 
 void loop(){
  if (Serial.available()) {
     char ch = Serial.read();
-    if(ch=='X'){
-      long pos = 0;
+    if(ch=='?'){
+      Serial.println("Manual : ");
+      Serial.println("A : Check if uC is still alive");
+      Serial.println("S : Start the motor and rock. Mandatory before Q");
+      Serial.println("Q100; Go to 100mm. ';' is important !");
+    }
+    if(ch=='A'){
+      Serial.println("I'm alive !");
+    }
+    if(ch=='P'){
+      long pos = getSerialInteger();
       Serial.print("Going to ");
       Serial.println(pos);
       linMotGoToPos(pos);
       Serial.println("Sent");
     }
-    if(ch=='Y'){
-      long pos = 500000;
+    if(ch=='Q'){
+      long pos = getSerialInteger();
       Serial.print("Going to ");
       Serial.println(pos);
-      linMotGoToPos(pos);
-      Serial.println("Sent");
-    }
-    if(ch=='Z'){
-      long pos = 1000000;
-      Serial.print("Going to ");
-      Serial.println(pos);
-      linMotGoToPos(pos);
-      Serial.println("Sent");
-    }
-    if(ch=='W'){
-      long pos = 2000000;
-      Serial.print("Going to ");
-      Serial.println(pos);
-      linMotGoToPos(pos);
+      linMotGoToPosMM(pos);
       Serial.println("Sent");
     }
     if(ch=='S'){
@@ -197,18 +201,5 @@ void loop(){
       Serial.println("Motor Ready");
     }
   } 
-
-
-
-  // if (Serial1.available()) {
-  //   int inByte = Serial1.read();
-  //   Serial.write(inByte);
-  // }
-
-  // // read from port 0, send to port 1:
-  // if (Serial.available()) {
-  //   int inByte = Serial.read();
-  //   Serial1.write(inByte);
-  // }
 
 }
