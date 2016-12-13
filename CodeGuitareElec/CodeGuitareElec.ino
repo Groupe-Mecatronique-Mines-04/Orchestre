@@ -97,8 +97,8 @@ void linMotStartProcedure(){
   linMotStart();
   delay(100);
   linMotHomingOn();
-  delay(1000);
-  linMotHomingOff();
+  //delay(10000);
+  //linMotHomingOff();
 }
 
 
@@ -175,8 +175,8 @@ void loop(){
     if(ch=='?'){
       Serial.println("Manual : ");
       Serial.println("A : Check if uC is still alive");
-      Serial.println("S : Start the motor and rock. Mandatory before Q");
-      Serial.println("Q100; Go to 100mm. ';' is important !");
+      Serial.println("S : Start the motor and rock. Mandatory before X");
+      Serial.println("X100; Go to 100mm. ';' is important !");
     }
     if(ch=='A'){
       Serial.println("I'm alive !");
@@ -188,7 +188,7 @@ void loop(){
       linMotGoToPos(pos);
       Serial.println("Sent");
     }
-    if(ch=='Q'){
+    if(ch=='X'){
       long pos = getSerialInteger();
       Serial.print("Going to ");
       Serial.println(pos);
