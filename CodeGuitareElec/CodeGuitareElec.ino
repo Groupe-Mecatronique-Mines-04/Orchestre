@@ -97,8 +97,9 @@ void linMotStartProcedure(){
   linMotStart();
   delay(100);
   linMotHomingOn();
-  //delay(10000);
-  //linMotHomingOff();
+  delay(5000);
+  linMotHomingOff();
+  Serial.println("Homing Off done");
 }
 
 
